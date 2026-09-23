@@ -26,15 +26,20 @@ else
 fi
 git branch -M main
 
-# 3. Prompt user to login to GitHub CLI
+# 3. Prompt user to login to GitHub CLI if not already authenticated
 echo ""
 echo "[3/5] Authenticating with GitHub..."
-echo "--------------------------------------------------------"
-echo "Follow the prompts below to authenticate."
-echo "CRITICAL: If pasting a Personal Access Token (PAT),"
-echo "ensure you check the box for the 'workflow' scope!"
-echo "--------------------------------------------------------"
-gh auth login
+if gh auth status >/dev/null 2>&1; then
+  echo "Already authenticated with GitHub CLI."
+else
+  echo "--------------------------------------------------------"
+  echo "Follow the prompts below to authenticate."
+  echo "CRITICAL: If pasting a Personal Access Token (PAT),"
+  echo "ensure you check the box for the 'workflow' scope!"
+  echo "--------------------------------------------------------"
+  gh auth login
+fi
+
 # 4. Automatically retrieve username from authenticated session
 echo ""
 echo "[4/5] Retrieving GitHub user profile..."
@@ -55,7 +60,7 @@ if gh repo view "$USERNAME/ace-module2-lab" >/dev/null 2>&1; then
   echo "Repository '$USERNAME/ace-module2-lab' already exists on GitHub."
   echo "Adding remote origin and pushing latest commits..."
   git remote add origin "https://github.com/$USERNAME/ace-module2-lab.git"
-  git push -u origin main
+  git push -u origin main --force
 else
   gh repo create ace-module2-lab --public --source=. --remote=origin --push
 fi
