@@ -91,6 +91,10 @@ def main() -> int:
         with open(report_path, encoding="utf-8", errors="replace") as fh:
             raw = fh.read()
 
+    if not raw.strip() or raw.strip().lower() == "null":
+        sys.stderr.write("::error::Security report is null or empty. CodeMender scan did not generate valid findings.\n")
+        return 1
+
     findings = extract_findings(raw)
 
     counts = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "OTHER": 0}

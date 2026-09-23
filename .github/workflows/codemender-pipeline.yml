@@ -46,6 +46,10 @@ on:
   # The fix/PR steps keep `github.event_name != 'pull_request'` guards, so a
   # pull_request trigger can be safely re-added here to gate PRs if desired.
 
+concurrency:
+  group: codemender-guardrail-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write          # create the remediation branch / commit the patch
   pull-requests: write     # open the autonomous remediation PR
@@ -160,6 +164,7 @@ jobs:
 
       - name: Triage Findings
         id: triage
+        if: ${{ always() && steps.scan.conclusion != 'skipped' }}
         run: |
           python3 .github/scripts/cm_triage.py "$RUNNER_TEMP/cm-security-report.json"
 
